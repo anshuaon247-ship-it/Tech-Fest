@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task 3: Interactive Parallax Scroll</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-white font-mono">
+
+  <canvas id="parallaxCanvas"></canvas>
+
+  <!-- Scrollable Sections -->
+  <div class="relative z-10">
+    <section class="h-screen flex items-center justify-center text-center">
+      <div class="bg-slate-900/80 p-8 rounded-xl border border-cyan-500/30">
+        <h1 class="text-4xl font-bold text-cyan-400">STAGE 01: INITIALIZE</h1>
+        <p class="text-xs text-slate-400 mt-2">Scroll down to observe 3D parallax shifts</p>
+      </div>
+    </section>
+
+    <section class="h-screen flex items-center justify-center text-center">
+      <div class="bg-slate-900/80 p-8 rounded-xl border border-cyan-500/30">
+        <h2 class="text-4xl font-bold text-cyan-400">STAGE 02: NEURAL ZOOM</h2>
+        <p class="text-xs text-slate-400 mt-2">Core approaches camera and accelerates rotation</p>
+      </div>
+    </section>
+
+    <section class="h-screen flex items-center justify-center text-center">
+      <div class="bg-slate-900/80 p-8 rounded-xl border border-cyan-500/30">
+        <h2 class="text-4xl font-bold text-cyan-400">STAGE 03: FULL INTEGRATION</h2>
+        <p class="text-xs text-slate-400 mt-2">Max depth transformation reached</p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const canvas = document.querySelector('#parallaxCanvas');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // 3D Wireframe Mesh
+    const geometry = new THREE.IcosahedronGeometry(2, 2);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00f2fe, wireframe: true });
+    const core = new THREE.Mesh(geometry, material);
+    scene.add(core);
+
+    camera.position.z = 6;
+
+    // Scroll Listener
+    let scrollY = 0;
+    window.addEventListener('scroll', () => {
+      scrollY = window.scrollY;
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Calculate Scroll Progress (0.0 to 1.0)
+      const scrollProgress = scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+
+      // Dynamic Parallax Transformations
+      core.position.z = scrollProgress * 3; 
+      core.rotation.y = scrollProgress * Math.PI * 4;
+      core.rotation.x = scrollProgress * Math.PI * 2;
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
