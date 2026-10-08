@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task 2: Build in 3D</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; background-color: #020617; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+
+  <!-- Overlay UI Label -->
+  <div class="absolute top-6 left-6 z-10 font-mono text-cyan-400 text-sm bg-slate-900/80 p-4 rounded border border-cyan-900">
+    <p>[ TASK 2 DEMO ]</p>
+    <p>3D Core Canvas Active (Three.js)</p>
+  </div>
+
+  <canvas id="canvas3d"></canvas>
+
+  <script>
+    const canvas = document.querySelector('#canvas3d');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // 1. Cyber Core Mesh
+    const geometry = new THREE.IcosahedronGeometry(2.5, 2);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00f2fe, wireframe: true });
+    const cyberCore = new THREE.Mesh(geometry, material);
+    scene.add(cyberCore);
+
+    // 2. Orbiting Particle System
+    const particleCount = 600;
+    const posArray = new Float32Array(particleCount * 3);
+    for(let i = 0; i < particleCount * 3; i++) {
+      posArray[i] = (Math.random() - 0.5) * 12;
+    }
+    const particlesGeo = new THREE.BufferGeometry();
+    particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    const particlesMat = new THREE.PointsMaterial({ size: 0.02, color: 0x00f2fe });
+    const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
+    scene.add(particlesMesh);
+
+    camera.position.z = 6;
+
+    // Animation Loop
+    function animate() {
+      requestAnimationFrame(animate);
+      cyberCore.rotation.y += 0.005;
+      cyberCore.rotation.x += 0.003;
+      particlesMesh.rotation.y -= 0.002;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
